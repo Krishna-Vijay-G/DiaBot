@@ -42,7 +42,7 @@
                     <i class="fas fa-robot"></i>
                     <span>AI Advisor</span>
                 </a>
-                {% if session.get('is_admin') %}
+                {% if session.get('logged_in') %}
                 <a href="{{ url_for('view_blockchain') }}" class="nav-link {% if request.endpoint == 'view_blockchain' %}active{% endif %}">
                     <i class="fas fa-link"></i>
                     <span>Blockchain</span>
@@ -133,7 +133,7 @@
                 <div class="footer-links">
                     <h4>Resources</h4>
                     <a href="{{ url_for('chatbot') }}">AI Health Advisor</a>
-                    {% if session.get('is_admin') %}
+                    {% if session.get('logged_in') %}
                     <a href="{{ url_for('view_blockchain') }}">Blockchain Records</a>
                     {% endif %}
                     <a href="#">API Documentation</a>

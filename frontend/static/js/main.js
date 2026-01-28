@@ -429,11 +429,75 @@ const Chatbot = {
     },
     
     formatMessage(content) {
-        // Simple markdown-like formatting
-        return content
-            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-            .replace(/\*(.*?)\*/g, '<em>$1</em>')
-            .replace(/\n/g, '<br>');
+        // Enhanced markdown formatting for chat messages
+        let formatted = content;
+        
+        // Escape HTML first to prevent XSS
+        formatted = formatted
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+        
+        // Horizontal rules (*** or ---)
+        formatted = formatted.replace(/^[\*\-]{3,}$/gm, '<hr style="border: none; border-top: 1px solid var(--border); margin: 1rem 0;">');
+        
+        // Headers (### Header)
+        formatted = formatted.replace(/^### \*\*(.*?)\*\*$/gm, '<h4 style="margin: 1rem 0 0.5rem; font-weight: 600; color: var(--text-primary);">$1</h4>');
+        formatted = formatted.replace(/^### (.*?)$/gm, '<h4 style="margin: 1rem 0 0.5rem; font-weight: 600; color: var(--text-primary);">$1</h4>');
+        formatted = formatted.replace(/^## (.*?)$/gm, '<h3 style="margin: 1rem 0 0.5rem; font-weight: 600; color: var(--text-primary);">$1</h3>');
+        formatted = formatted.replace(/^# (.*?)$/gm, '<h2 style="margin: 1rem 0 0.5rem; font-weight: 700; color: var(--text-primary);">$1</h2>');
+        
+        // Bold text (**text**)
+        formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        
+        // Italic text (*text*)
+        formatted = formatted.replace(/\*([^\*\n]+)\*/g, '<em>$1</em>');
+        
+        // Process lists - convert bullet points
+        const lines = formatted.split('\n');
+        let inList = false;
+        let processedLines = [];
+        
+        for (let i = 0; i < lines.length; i++) {
+            let line = lines[i];
+            const bulletMatch = line.match(/^(\s*)\* (.+)$/);
+            const dashMatch = line.match(/^(\s*)- (.+)$/);
+            
+            if (bulletMatch || dashMatch) {
+                const match = bulletMatch || dashMatch;
+                const indent = match[1].length;
+                const text = match[2];
+                
+                if (!inList) {
+                    processedLines.push('<ul style="margin: 0.5rem 0; padding-left: 1.5rem; list-style-type: disc;">');
+                    inList = true;
+                }
+                processedLines.push(`<li style="margin: 0.25rem 0;">${text}</li>`);
+            } else {
+                if (inList) {
+                    processedLines.push('</ul>');
+                    inList = false;
+                }
+                processedLines.push(line);
+            }
+        }
+        
+        if (inList) {
+            processedLines.push('</ul>');
+        }
+        
+        formatted = processedLines.join('\n');
+        
+        // Convert remaining newlines to <br> (but not inside tags)
+        formatted = formatted.replace(/\n/g, '<br>');
+        
+        // Clean up excessive <br> tags
+        formatted = formatted.replace(/(<br>){3,}/g, '<br><br>');
+        formatted = formatted.replace(/<\/ul><br>/g, '</ul>');
+        formatted = formatted.replace(/<\/h[234]><br>/g, (match) => match.replace('<br>', ''));
+        formatted = formatted.replace(/<hr[^>]*><br>/g, (match) => match.replace('<br>', ''));
+        
+        return formatted;
     },
 
     // Simple HTML escaper to prevent injection when inserting conversation titles

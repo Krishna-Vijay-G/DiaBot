@@ -150,7 +150,7 @@
         
         <!-- Actions -->
         <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-top: 2rem;">
-            <a href="{{ url_for('chatbot') }}" class="btn btn-primary btn-lg">
+            <a href="{{ url_for('analyze_result_with_chatbot', result_id=result.id) }}" class="btn btn-primary btn-lg">
                 <i class="fas fa-comments"></i>
                 <span>Discuss with AI Advisor</span>
             </a>
