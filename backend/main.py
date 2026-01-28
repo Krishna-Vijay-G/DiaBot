@@ -761,15 +761,11 @@ def register_routes(app):
     
     @app.route('/blockchain')
     def view_blockchain():
-        """View blockchain ledger - Admin only"""
-        # Check if user is logged in and is admin
+        """View blockchain ledger - Available to all logged-in users"""
+        # Check if user is logged in
         if not session.get('logged_in'):
             flash('Please login to access this page', 'error')
             return redirect(url_for('login'))
-        
-        if not session.get('is_admin'):
-            flash('Access denied. Admin privileges required.', 'error')
-            return redirect(url_for('index'))
         
         from blockchain import Blockchain
         blockchain_obj = Blockchain(db.session)
