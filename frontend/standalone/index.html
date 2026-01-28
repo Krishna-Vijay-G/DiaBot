@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiaBot - Standalone Frontend Example</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 500px;
+            width: 100%;
+        }
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        p {
+            color: #666;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        .message {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .message.show {
+            display: block;
+        }
+        .links {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .links a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .links a:hover {
+            text-decoration: underline;
+        }
+        #userInfo {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        #userInfo.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🩺 DiaBot API Demo</h1>
+        <p>Standalone Frontend Example</p>
+
+        <div id="userInfo">
+            <strong>Logged in as:</strong> <span id="username"></span>
+            <button onclick="logout()" style="margin-top: 10px; background: #dc3545;">Logout</button>
+        </div>
+
+        <div id="message" class="message"></div>
+
+        <!-- Login Form -->
+        <div id="loginForm">
+            <h2 style="margin-bottom: 20px;">Login</h2>
+            <form onsubmit="login(event)">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="loginEmail" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                <button type="submit">Login</button>
+            </form>
+            <div class="links">
+                <a href="#" onclick="showRegister(); return false;">Don't have an account? Register</a>
+            </div>
+        </div>
+
+        <!-- Register Form -->
+        <div id="registerForm" style="display: none;">
+            <h2 style="margin-bottom: 20px;">Register</h2>
+            <form onsubmit="register(event)">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="regUsername" required>
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="regEmail" required>
+                </div>
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="tel" id="regPhone" required pattern="[0-9]{10,15}" placeholder="10-15 digits">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="regPassword" required minlength="6">
+                </div>
+                <button type="submit">Register</button>
+            </form>
+            <div class="links">
+                <a href="#" onclick="showLogin(); return false;">Already have an account? Login</a>
+            </div>
+        </div>
+
+        <!-- Diabetes Form -->
+        <div id="diabetesForm" style="display: none;">
+            <h2 style="margin-bottom: 20px;">Diabetes Screening</h2>
+            <form onsubmit="analyzeDiabetes(event)">
+                <div class="form-group">
+                    <label>Age</label>
+                    <input type="number" id="age" min="1" max="120" required>
+                </div>
+                <div class="form-group">
+                    <label>Gender</label>
+                    <select id="gender" style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px;">
+                        <option value="0">Female</option>
+                        <option value="1">Male</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label><input type="checkbox" id="polyuria"> Polyuria (Excessive urination)</label>
+                    <label><input type="checkbox" id="polydipsia"> Polydipsia (Excessive thirst)</label>
+                    <label><input type="checkbox" id="weakness"> Weakness</label>
+                    <label><input type="checkbox" id="obesity"> Obesity</label>
+                </div>
+                <button type="submit">Analyze</button>
+            </form>
+        </div>
+
+        <!-- Result -->
+        <div id="result" style="display: none;">
+            <h2 style="margin-bottom: 20px;">Result</h2>
+            <div id="resultContent"></div>
+            <button onclick="showDiabetesForm()" style="margin-top: 20px;">New Screening</button>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000/api/v1';
+
+        // Check if user is logged in on load
+        window.onload = async function() {
+            try {
+                const response = await fetch(`${API_URL}/auth/me`, {
+                    credentials: 'include'
+                });
+                const data = await response.json();
+                if (data.logged_in) {
+                    document.getElementById('username').textContent = data.user.username;
+                    document.getElementById('userInfo').classList.add('show');
+                    showDiabetesForm();
+                }
+            } catch (error) {
+                console.error('Auth check failed:', error);
+            }
+        };
+
+        function showMessage(text, type) {
+            const msg = document.getElementById('message');
+            msg.textContent = text;
+            msg.className = `message ${type} show`;
+            setTimeout(() => msg.classList.remove('show'), 5000);
+        }
+
+        function showLogin() {
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('diabetesForm').style.display = 'none';
+            document.getElementById('result').style.display = 'none';
+        }
+
+        function showRegister() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'block';
+            document.getElementById('diabetesForm').style.display = 'none';
+            document.getElementById('result').style.display = 'none';
+        }
+
+        function showDiabetesForm() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('diabetesForm').style.display = 'block';
+            document.getElementById('result').style.display = 'none';
+        }
+
+        async function register(event) {
+            event.preventDefault();
+            try {
+                const response = await fetch(`${API_URL}/auth/register`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        username: document.getElementById('regUsername').value,
+                        email: document.getElementById('regEmail').value,
+                        phone: document.getElementById('regPhone').value,
+                        password: document.getElementById('regPassword').value
+                    })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    showMessage('Account created! Please login.', 'success');
+                    showLogin();
+                } else {
+                    showMessage(data.error, 'error');
+                }
+            } catch (error) {
+                showMessage('Registration failed', 'error');
+            }
+        }
+
+        async function login(event) {
+            event.preventDefault();
+            try {
+                const response = await fetch(`${API_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        email: document.getElementById('loginEmail').value,
+                        password: document.getElementById('loginPassword').value
+                    })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    document.getElementById('username').textContent = data.user.username;
+                    document.getElementById('userInfo').classList.add('show');
+                    showMessage('Login successful!', 'success');
+                    showDiabetesForm();
+                } else {
+                    showMessage(data.error, 'error');
+                }
+            } catch (error) {
+                showMessage('Login failed', 'error');
+            }
+        }
+
+        async function logout() {
+            try {
+                await fetch(`${API_URL}/auth/logout`, {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+                document.getElementById('userInfo').classList.remove('show');
+                showMessage('Logged out', 'success');
+                showLogin();
+            } catch (error) {
+                showMessage('Logout failed', 'error');
+            }
+        }
+
+        async function analyzeDiabetes(event) {
+            event.preventDefault();
+            try {
+                const response = await fetch(`${API_URL}/diabetes/analyze`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        age: parseInt(document.getElementById('age').value),
+                        gender: parseInt(document.getElementById('gender').value),
+                        polyuria: document.getElementById('polyuria').checked ? 1 : 0,
+                        polydipsia: document.getElementById('polydipsia').checked ? 1 : 0,
+                        weakness: document.getElementById('weakness').checked ? 1 : 0,
+                        obesity: document.getElementById('obesity').checked ? 1 : 0,
+                        sudden_weight_loss: 0,
+                        polyphagia: 0,
+                        genital_thrush: 0,
+                        visual_blurring: 0,
+                        itching: 0,
+                        irritability: 0,
+                        delayed_healing: 0,
+                        partial_paresis: 0,
+                        muscle_stiffness: 0,
+                        alopecia: 0
+                    })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    const pred = data.prediction;
+                    document.getElementById('resultContent').innerHTML = `
+                        <div style="text-align: center;">
+                            <h3 style="color: ${pred.prediction === 'High Risk' ? '#dc3545' : '#28a745'}">
+                                ${pred.prediction}
+                            </h3>
+                            <p>Probability: ${(pred.raw_probability * 100).toFixed(1)}%</p>
+                            <p>Confidence: ${(pred.confidence * 100).toFixed(1)}%</p>
+                        </div>
+                    `;
+                    document.getElementById('diabetesForm').style.display = 'none';
+                    document.getElementById('result').style.display = 'block';
+                } else {
+                    showMessage(data.error, 'error');
+                }
+            } catch (error) {
+                showMessage('Analysis failed', 'error');
+            }
+        }
+    </script>
+</body>
+</html>

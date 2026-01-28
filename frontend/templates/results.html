@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+
+{% block title %}Screening Results{% endblock %}
+
+{% block content %}
+<section class="results-hero">
+    <div class="results-container">
+        <div class="result-header">
+            <span class="result-type-badge">
+                <i class="fas fa-{{ 'droplet' if result_type == 'diabetes' else 'heart-pulse' if result_type == 'heart' else 'hand-dots' if result_type == 'dermatology' else 'ribbon' }}"></i>
+                {{ result_type|capitalize if result_type else 'Health' }} Screening
+            </span>
+            <h1 class="result-title">Your Screening Results</h1>
+        </div>
+        
+        <!-- Risk Indicator -->
+        <div class="risk-indicator">
+            {% set risk_level = 'high' if prediction == 1 or (probability and probability > 0.7) else 'moderate' if probability and probability > 0.4 else 'low' %}
+            
+            <div class="risk-circle {{ risk_level }}">
+                <span class="risk-value">
+                    {% if probability %}
+                        {{ (probability * 100)|round(1) }}%
+                    {% else %}
+                        {{ 'HIGH' if prediction == 1 else 'LOW' }}
+                    {% endif %}
+                </span>
+                <span class="risk-label">Risk Level</span>
+            </div>
+            
+            <span class="risk-text {{ risk_level }}">
+                {% if prediction == 1 or (probability and probability > 0.5) %}
+                    <i class="fas fa-exclamation-triangle"></i> Elevated Risk Detected
+                {% else %}
+                    <i class="fas fa-check-circle"></i> Lower Risk Indicated
+                {% endif %}
+            </span>
+            
+            {% if probability %}
+            <div class="confidence-bar">
+                <div class="confidence-label">
+                    <span>Confidence</span>
+                    <span>{{ (probability * 100)|round(1) }}%</span>
+                </div>
+                <div class="confidence-track">
+                    <div class="confidence-fill" data-width="{{ (probability * 100)|round(1) }}"></div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Interpretation Section -->
+        <div class="result-section">
+            <div class="result-section-header">
+                <div class="result-section-icon">
+                    <i class="fas fa-file-medical"></i>
+                </div>
+                <h2 class="result-section-title">Result Interpretation</h2>
+            </div>
+            <div class="result-section-content">
+                <p style="line-height: 1.8; margin-bottom: 1rem;">
+                    {% if prediction == 1 %}
+                        Based on your symptom profile, our AI model indicates an <strong>elevated risk</strong> for diabetes. 
+                        This does not mean you have diabetes, but suggests you should consult a healthcare provider for 
+                        proper clinical evaluation and blood glucose testing.
+                    {% else %}
+                        Your symptom profile suggests a <strong>lower probability</strong> of diabetes based on the 
+                        16 symptom indicators analyzed. However, this is a screening tool and does not replace 
+                        professional medical assessment.
+                    {% endif %}
+                </p>
+                
+                {% if explanation %}
+                <div style="background: var(--bg-primary); padding: 1rem; border-radius: var(--radius-md); margin-top: 1rem;">
+                    <h4 style="font-family: var(--font-display); margin-bottom: 0.5rem;">
+                        <i class="fas fa-lightbulb text-warning"></i> AI Explanation
+                    </h4>
+                    <p style="color: var(--text-secondary); font-size: 0.9375rem;">{{ explanation }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Key Factors Section -->
+        {% if key_factors %}
+        <div class="result-section">
+            <div class="result-section-header">
+                <div class="result-section-icon">
+                    <i class="fas fa-chart-bar"></i>
+                </div>
+                <h2 class="result-section-title">Contributing Factors</h2>
+            </div>
+            <div class="result-section-content">
+                <ul class="result-list">
+                    {% for factor in key_factors %}
+                    <li>
+                        <i class="fas fa-arrow-right"></i>
+                        <span>{{ factor }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Recommendations Section -->
+        <div class="result-section">
+            <div class="result-section-header">
+                <div class="result-section-icon" style="background: var(--success-light); color: var(--success);">
+                    <i class="fas fa-clipboard-check"></i>
+                </div>
+                <h2 class="result-section-title">Recommendations</h2>
+            </div>
+            <div class="result-section-content">
+                <ul class="result-list">
+                    {% if prediction == 1 %}
+                    <li>
+                        <i class="fas fa-user-doctor text-primary"></i>
+                        <span><strong>Consult a Healthcare Provider:</strong> Schedule an appointment for proper clinical evaluation and blood glucose testing (HbA1c, fasting glucose)</span>
+                    </li>
+                    <li>
+                        <i class="fas fa-apple-whole text-success"></i>
+                        <span><strong>Lifestyle Modifications:</strong> Consider dietary changes, increased physical activity, and weight management</span>
+                    </li>
+                    <li>
+                        <i class="fas fa-chart-line text-info"></i>
+                        <span><strong>Monitor Symptoms:</strong> Keep track of any changes in your symptoms and report them to your healthcare provider</span>
+                    </li>
+                    {% else %}
+                    <li>
+                        <i class="fas fa-shield-heart text-success"></i>
+                        <span><strong>Maintain Healthy Habits:</strong> Continue with balanced nutrition and regular physical activity</span>
+                    </li>
+                    <li>
+                        <i class="fas fa-calendar-check text-info"></i>
+                        <span><strong>Regular Check-ups:</strong> Schedule routine health screenings as recommended for your age group</span>
+                    </li>
+                    <li>
+                        <i class="fas fa-eye text-warning"></i>
+                        <span><strong>Stay Aware:</strong> Monitor for any new symptoms and re-screen if symptoms develop</span>
+                    </li>
+                    {% endif %}
+                    <li>
+                        <i class="fas fa-robot text-secondary"></i>
+                        <span><strong>AI Health Advisor:</strong> Chat with Dr. DiaBot for personalized guidance and questions about your results</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Actions -->
+        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-top: 2rem;">
+            <a href="{{ url_for('chatbot') }}" class="btn btn-primary btn-lg">
+                <i class="fas fa-comments"></i>
+                <span>Discuss with AI Advisor</span>
+            </a>
+            <a href="{{ url_for('diabetes') }}" class="btn btn-secondary btn-lg">
+                <i class="fas fa-redo"></i>
+                <span>New Screening</span>
+            </a>
+            <a href="{{ url_for('view_blockchain') }}" class="btn btn-secondary btn-lg">
+                <i class="fas fa-link"></i>
+                <span>View Blockchain Record</span>
+            </a>
+        </div>
+        
+        <!-- Disclaimer -->
+        <div style="background: var(--warning-light); border-radius: var(--radius-lg); padding: 1.5rem; margin-top: 2rem; text-align: center;">
+            <p style="color: var(--gray-700); margin: 0;">
+                <i class="fas fa-exclamation-triangle" style="color: var(--warning);"></i>
+                <strong>Medical Disclaimer:</strong> This screening tool is for informational purposes only and does not constitute medical advice. 
+                Always consult qualified healthcare professionals for diagnosis and treatment decisions.
+            </p>
+        </div>
+    </div>
+</section>
+{% endblock %}

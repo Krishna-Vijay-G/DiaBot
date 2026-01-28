@@ -1,0 +1,228 @@
+{% extends "base.html" %}
+
+{% block title %}DiaBot - AI-Powered Health Screening{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero">
+    <div class="floating-element float-1"></div>
+    <div class="floating-element float-2"></div>
+    <div class="floating-element float-3"></div>
+    
+    <div class="hero-container">
+        <div class="hero-content">
+            <div class="hero-badge">
+                <i class="fas fa-shield-heart"></i>
+                <span>98.1% Accuracy Rate</span>
+            </div>
+            
+            <h1 class="hero-title">
+                Early Diabetes Detection Powered by AI
+            </h1>
+            
+            <p class="hero-description">
+                DiaBot uses advanced machine learning to provide non-invasive diabetes risk screening in seconds. 
+                Get personalized health insights and AI-powered recommendations.
+            </p>
+            
+            <div class="hero-actions">
+                <a href="{{ url_for('diabetes') }}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-play"></i>
+                    <span>Start Screening</span>
+                </a>
+                <a href="{{ url_for('chatbot') }}" class="btn btn-secondary btn-lg">
+                    <i class="fas fa-robot"></i>
+                    <span>Talk to AI Advisor</span>
+                </a>
+            </div>
+        </div>
+        
+        <div class="hero-visual">
+            <div class="hero-card">
+                <div class="hero-stats">
+                    <div class="stat-item animate-on-scroll">
+                        <div class="stat-value" data-counter="98" data-suffix="%">0%</div>
+                        <div class="stat-label">Accuracy Rate</div>
+                    </div>
+                    <div class="stat-item animate-on-scroll">
+                        <div class="stat-value" data-counter="16" data-suffix="">0</div>
+                        <div class="stat-label">Symptom Analysis</div>
+                    </div>
+                    <div class="stat-item animate-on-scroll">
+                        <div class="stat-value" data-prefix="<" data-counter="1" data-suffix="s">0s</div>
+                        <div class="stat-label">Response Time</div>
+                    </div>
+                    <div class="stat-item animate-on-scroll">
+                        <div class="stat-value">24/7</div>
+                        <div class="stat-label">AI Availability</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="section" id="features">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Why Choose DiaBot?</h2>
+            <p class="section-description">
+                Experience the future of health screening with our advanced AI-powered platform
+            </p>
+        </div>
+        
+        <div class="grid grid-3 gap-3">
+            <div class="card feature-card animate-on-scroll">
+                <div class="feature-icon">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <h3 class="feature-title">LightGBM ML Model</h3>
+                <p class="feature-description">
+                    Advanced gradient boosting algorithm trained on the UCI Early Stage Diabetes dataset with 98.1% accuracy
+                </p>
+            </div>
+            
+            <div class="card feature-card animate-on-scroll">
+                <div class="feature-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <h3 class="feature-title">Instant Results</h3>
+                <p class="feature-description">
+                    Get your risk assessment in under a second with our optimized inference engine
+                </p>
+            </div>
+            
+            <div class="card feature-card animate-on-scroll">
+                <div class="feature-icon">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h3 class="feature-title">AI Health Advisor</h3>
+                <p class="feature-description">
+                    Chat with Dr. DiaBot, our Gemini-powered AI, for personalized health guidance and explanations
+                </p>
+            </div>
+            
+            <div class="card feature-card animate-on-scroll">
+                <div class="feature-icon">
+                    <i class="fas fa-shield-halved"></i>
+                </div>
+                <h3 class="feature-title">Non-Invasive</h3>
+                <p class="feature-description">
+                    Symptom-based screening without blood tests or medical procedures required
+                </p>
+            </div>
+            
+            <div class="card feature-card animate-on-scroll">
+                <div class="feature-icon">
+                    <i class="fas fa-link"></i>
+                </div>
+                <h3 class="feature-title">Blockchain Audit</h3>
+                <p class="feature-description">
+                    All screening records secured with immutable blockchain technology for transparency
+                </p>
+            </div>
+            
+            <div class="card feature-card animate-on-scroll">
+                <div class="feature-icon">
+                    <i class="fas fa-book-medical"></i>
+                </div>
+                <h3 class="feature-title">Educational Insights</h3>
+                <p class="feature-description">
+                    Understand your results with detailed explanations and evidence-based recommendations
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Diagnostic Services Section -->
+<section class="section" style="background: var(--bg-secondary);">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Diabetes Screening Service</h2>
+            <p class="section-description">
+                Advanced AI-powered diabetes risk assessment for early detection
+            </p>
+        </div>
+        
+        <div class="grid grid-1 gap-3" style="max-width: 600px; margin: 0 auto;">
+            <div class="card diagnostic-card animate-on-scroll">
+                <div class="card-body">
+                    <div class="card-icon diabetes">
+                        <i class="fas fa-droplet"></i>
+                    </div>
+                    <h3>Diabetes Screening</h3>
+                    <p>Non-invasive 16-symptom analysis for early diabetes detection with LightGBM ML</p>
+                </div>
+                <div class="card-footer">
+                    <span class="accuracy-badge">
+                        <i class="fas fa-check-circle"></i>
+                        98.1% Accuracy
+                    </span>
+                    <a href="{{ url_for('diabetes') }}" class="btn btn-sm btn-primary">Start</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="section" id="how-it-works">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">How It Works</h2>
+            <p class="section-description">
+                Three simple steps to get your AI-powered health screening results
+            </p>
+        </div>
+        
+        <div class="grid grid-3 gap-3">
+            <div class="card animate-on-scroll" style="text-align: center; padding: 2rem;">
+                <div style="width: 64px; height: 64px; background: var(--primary); color: white; border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 700; margin: 0 auto 1.5rem;">1</div>
+                <h3 style="font-family: var(--font-display); margin-bottom: 0.75rem;">Answer Questions</h3>
+                <p style="color: var(--text-secondary);">Complete a simple symptom questionnaire - no blood tests or medical procedures required</p>
+            </div>
+            
+            <div class="card animate-on-scroll" style="text-align: center; padding: 2rem;">
+                <div style="width: 64px; height: 64px; background: var(--primary); color: white; border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 700; margin: 0 auto 1.5rem;">2</div>
+                <h3 style="font-family: var(--font-display); margin-bottom: 0.75rem;">AI Analysis</h3>
+                <p style="color: var(--text-secondary);">Our LightGBM model processes your responses with 0.06ms inference time</p>
+            </div>
+            
+            <div class="card animate-on-scroll" style="text-align: center; padding: 2rem;">
+                <div style="width: 64px; height: 64px; background: var(--primary); color: white; border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 700; margin: 0 auto 1.5rem;">3</div>
+                <h3 style="font-family: var(--font-display); margin-bottom: 0.75rem;">Get Results</h3>
+                <p style="color: var(--text-secondary);">Receive detailed risk assessment with personalized recommendations and explanations</p>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 3rem;">
+            <a href="{{ url_for('diabetes') }}" class="btn btn-primary btn-lg">
+                <i class="fas fa-arrow-right"></i>
+                <span>Start Your Free Screening</span>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="section" style="background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white;">
+    <div class="container" style="text-align: center;">
+        <h2 style="font-family: var(--font-display); font-size: 2.5rem; margin-bottom: 1rem;">Ready to Take Control of Your Health?</h2>
+        <p style="font-size: 1.25rem; opacity: 0.9; margin-bottom: 2rem; max-width: 600px; margin-left: auto; margin-right: auto;">
+            Join thousands using DiaBot for early diabetes detection. Quick, non-invasive, and powered by advanced AI.
+        </p>
+        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+            <a href="{{ url_for('diabetes') }}" class="btn btn-lg" style="background: white; color: var(--primary);">
+                <i class="fas fa-play"></i>
+                <span>Start Screening Now</span>
+            </a>
+            <a href="{{ url_for('chatbot') }}" class="btn btn-lg" style="background: transparent; border: 2px solid white; color: white;">
+                <i class="fas fa-comments"></i>
+                <span>Chat with AI Advisor</span>
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Server Error{% endblock %}
+
+{% block content %}
+<div class="error-page">
+    <div class="error-content">
+        <div class="error-code">500</div>
+        <h1 class="error-title">Something Went Wrong</h1>
+        <p class="error-description">
+            We encountered an unexpected error. Our team has been notified. 
+            Please try again later or contact support if the issue persists.
+        </p>
+        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+            <a href="{{ url_for('index') }}" class="btn btn-primary">
+                <i class="fas fa-home"></i>
+                <span>Back to Home</span>
+            </a>
+            <button onclick="location.reload()" class="btn btn-secondary">
+                <i class="fas fa-redo"></i>
+                <span>Try Again</span>
+            </button>
+        </div>
+        
+        {% if error %}
+        <div style="margin-top: 2rem; padding: 1rem; background: var(--danger-light); border-radius: var(--radius-md); text-align: left;">
+            <p style="font-size: 0.875rem; color: var(--danger);">
+                <strong>Error Details:</strong><br>
+                {{ error }}
+            </p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

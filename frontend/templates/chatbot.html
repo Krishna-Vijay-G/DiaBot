@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+
+{% block title %}AI Health Advisor{% endblock %}
+
+{% block extra_css %}
+<style>
+    .chat-page {
+        display: flex;
+        flex-direction: column;
+        min-height: 0; /* Allow flex item to shrink */
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="chat-container" data-conversation-id="{{ conversation_id or '' }}">
+    <!-- Sidebar -->
+    <aside class="chat-sidebar">
+        <div class="chat-sidebar-header">
+            <h2>Conversations</h2>
+            <a href="{{ url_for('chatbot') }}" class="btn btn-primary btn-sm w-full">
+                <i class="fas fa-plus"></i>
+                <span>New Chat</span>
+            </a>
+        </div>
+        
+        <div class="chat-conversations">
+            {% if conversations %}
+                {% for conv in conversations %}
+                <div class="chat-conversation-item {% if conv.id == conversation_id %}active{% endif %}" 
+                     onclick="window.location.href='{{ url_for('chatbot_conversation', conversation_id=conv.id) }}'">
+                    <div class="chat-conversation-icon">
+                        <i class="fas fa-message"></i>
+                    </div>
+                    <div class="chat-conversation-info">
+                        <div class="chat-conversation-title">{{ conv.title or 'New Conversation' }}</div>
+                        <div class="chat-conversation-time">
+                            {% if conv.created_at_dt %}
+                                {{ conv.created_at_dt.strftime('%b %d, %H:%M') }}
+                            {% elif conv.created_at %}
+                                {{ conv.created_at }}
+                            {% else %}
+                                
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                    <i class="fas fa-comments" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
+                    <p>No conversations yet</p>
+                    <p style="font-size: 0.875rem;">Start a new chat to begin</p>
+                </div>
+            {% endif %}
+        </div>
+    </aside>
+    
+    <!-- Main Chat Area -->
+    <div class="chat-main">
+        <header class="chat-header">
+            <div class="chat-avatar">
+                <i class="fas fa-robot"></i>
+            </div>
+            <div class="chat-info">
+                <h3>Dr. DiaBot</h3>
+                <p><i class="fas fa-circle" style="font-size: 0.5rem;"></i> Online - AI Health Advisor</p>
+            </div>
+            <div style="margin-left: auto; display: flex; gap: 0.5rem;">
+                <button class="btn btn-icon btn-secondary" title="Clear chat" onclick="if(confirm('Clear this conversation?')) location.reload();">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        </header>
+        
+        <div class="chat-messages" id="chatMessages">
+            {% if messages %}
+                {% for msg in messages %}
+                <div class="chat-message {{ msg.role }}">
+                    <div class="message-avatar">
+                        {% if msg.role == 'assistant' %}
+                            <i class="fas fa-robot"></i>
+                        {% else %}
+                            <i class="fas fa-user"></i>
+                        {% endif %}
+                    </div>
+                    <div class="message-bubble">
+                        <div class="message-content">{{ msg.content|safe }}</div>
+                        <div class="message-time">
+                            {% if msg.timestamp is string %}
+                                {{ msg.timestamp }}
+                            {% elif msg.timestamp %}
+                                {{ msg.timestamp.strftime('%H:%M') }}
+                            {% else %}
+                                
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <!-- Welcome Message -->
+                <div class="chat-message assistant">
+                    <div class="message-avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="message-bubble">
+                        <div class="message-content">
+                            <strong>Hello! I'm Dr. DiaBot, your AI Health Advisor.</strong><br><br>
+                            I can help you with:
+                            <ul style="margin: 0.5rem 0 0 1rem; padding: 0;">
+                                <li>Understanding your screening results</li>
+                                <li>Information about diabetes and risk factors</li>
+                                <li>General health and lifestyle guidance</li>
+                                <li>Questions about symptoms and prevention</li>
+                            </ul>
+                            <br>
+                            <em style="color: var(--text-muted);">Remember: I provide educational information only, not medical diagnosis. Always consult healthcare professionals for medical decisions.</em>
+                        </div>
+                        <div class="message-time">Now</div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="chat-input-container">
+            <form id="chatForm" class="chat-input-form">
+                <div class="chat-input-wrapper">
+                    <textarea 
+                        id="chatInput" 
+                        class="chat-input" 
+                        placeholder="Ask me anything about diabetes, your results, or health in general..."
+                        rows="1"
+                        required
+                    ></textarea>
+                </div>
+                <button type="submit" class="chat-send-btn" id="chatSendBtn" aria-label="Send message">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </form>
+            <p style="text-align: center; font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;">
+                <i class="fas fa-info-circle"></i>
+                Dr. DiaBot is powered by Google Gemini AI. Not a substitute for professional medical advice.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Quick prompts functionality
+    document.querySelectorAll('.quick-prompt').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const prompt = btn.dataset.prompt;
+            document.getElementById('chatInput').value = prompt;
+            document.getElementById('chatForm').dispatchEvent(new Event('submit'));
+        });
+    });
+</script>
+{% endblock %}

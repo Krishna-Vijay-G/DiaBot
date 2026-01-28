@@ -1,0 +1,266 @@
+{% extends "base.html" %}
+
+{% block title %}Diabetes Screening{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container-lg">
+        <!-- Header -->
+        <div class="section-header">
+            <div class="hero-badge" style="margin: 0 auto 1rem;">
+                <i class="fas fa-droplet"></i>
+                <span>98.1% Accuracy</span>
+            </div>
+            <h1 class="section-title">Diabetes Risk Screening</h1>
+            <p class="section-description">
+                Answer 16 simple symptom-based questions for an AI-powered diabetes risk assessment. 
+                No blood tests or invasive procedures required.
+            </p>
+        </div>
+        
+        <!-- Form Card -->
+        <div class="card" style="max-width: 800px; margin: 0 auto;">
+            <div class="card-header" style="display: flex; align-items: center; gap: 1rem;">
+                <div class="result-section-icon">
+                    <i class="fas fa-clipboard-list"></i>
+                </div>
+                <div>
+                    <h2 style="font-family: var(--font-display); font-size: 1.25rem; font-weight: 700;">Symptom Questionnaire</h2>
+                    <p style="color: var(--text-secondary); font-size: 0.875rem;">Please answer all questions based on your current condition</p>
+                </div>
+            </div>
+            
+            <form id="diabetesForm" action="{{ url_for('diabetes') }}" method="POST">
+                <div class="card-body">
+                    <!-- Demographics Section -->
+                    <div style="margin-bottom: 2rem;">
+                        <h3 style="font-family: var(--font-display); font-size: 1rem; font-weight: 600; margin-bottom: 1rem; color: var(--primary);">
+                            <i class="fas fa-user"></i> Demographics
+                        </h3>
+                        
+                        <div class="grid grid-2 gap-3">
+                            <!-- Age -->
+                            <div class="form-group">
+                                <label class="form-label" for="age">Age (years)</label>
+                                <input type="number" name="age" id="age" class="form-input" 
+                                       min="1" max="120" required 
+                                       placeholder="Enter your age"
+                                       style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 0.5rem; font-size: 1rem;">
+                            </div>
+                            
+                            <!-- Gender -->
+                            <div class="form-group">
+                                <label class="form-label">Gender</label>
+                                <div class="form-options">
+                                    <div class="form-option">
+                                        <input type="radio" name="gender" id="gender_male" value="1" required>
+                                        <label for="gender_male"><i class="fas fa-mars"></i> Male</label>
+                                    </div>
+                                    <div class="form-option">
+                                        <input type="radio" name="gender" id="gender_female" value="0">
+                                        <label for="gender_female"><i class="fas fa-venus"></i> Female</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Primary Symptoms Section -->
+                    <div style="margin-bottom: 2rem;">
+                        <h3 style="font-family: var(--font-display); font-size: 1rem; font-weight: 600; margin-bottom: 1rem; color: var(--primary);">
+                            <i class="fas fa-notes-medical"></i> Primary Symptoms (Classic Triad)
+                        </h3>
+                        
+                        <div class="toggle-group">
+                            <div class="toggle-item">
+                                <label class="toggle-label" for="polyuria">
+                                    <strong>Polyuria</strong>
+                                    <span style="display: block; font-size: 0.8125rem; color: var(--text-muted);">Excessive urination</span>
+                                </label>
+                                <input type="checkbox" name="polyuria" id="polyuria" value="1">
+                                <span class="toggle-switch"></span>
+                            </div>
+                            
+                            <div class="toggle-item">
+                                <label class="toggle-label" for="polydipsia">
+                                    <strong>Polydipsia</strong>
+                                    <span style="display: block; font-size: 0.8125rem; color: var(--text-muted);">Excessive thirst</span>
+                                </label>
+                                <input type="checkbox" name="polydipsia" id="polydipsia" value="1">
+                                <span class="toggle-switch"></span>
+                            </div>
+                            
+                            <div class="toggle-item">
+                                <label class="toggle-label" for="polyphagia">
+                                    <strong>Polyphagia</strong>
+                                    <span style="display: block; font-size: 0.8125rem; color: var(--text-muted);">Excessive hunger</span>
+                                </label>
+                                <input type="checkbox" name="polyphagia" id="polyphagia" value="1">
+                                <span class="toggle-switch"></span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Physical Symptoms Section -->
+                    <div style="margin-bottom: 2rem;">
+                        <h3 style="font-family: var(--font-display); font-size: 1rem; font-weight: 600; margin-bottom: 1rem; color: var(--primary);">
+                            <i class="fas fa-body-text"></i> Physical Symptoms
+                        </h3>
+                        
+                        <div class="toggle-group">
+                            <div class="toggle-item">
+                                <label class="toggle-label" for="sudden_weight_loss">
+                                    <strong>Sudden Weight Loss</strong>
+                                    <span style="display: block; font-size: 0.8125rem; color: var(--text-muted);">Unexplained weight loss</span>
+                                </label>
+                                <input type="checkbox" name="sudden_weight_loss" id="sudden_weight_loss" value="1">
+                                <span class="toggle-switch"></span>
+                            </div>
+                            
+                            <div class="toggle-item">
+                                <label class="toggle-label" for="weakness">
+                                    <strong>Weakness</strong>
+                                    <span style="display: block; font-size: 0.8125rem; color: var(--text-muted);">General weakness or fatigue</span>
+                                </label>
+                                <input type="checkbox" name="weakness" id="weakness" value="1">
+                                <span class="toggle-switch"></span>
+                            </div>
+                            
+                            <div class="toggle-item">
+                                <label class="toggle-label" for="genital_thrush">
+                                    <strong>Genital Thrush</strong>
+                                    <span style="display: block; font-size: 0.8125rem; color: var(--text-muted);">Yeast infections</span>
+                                </label>
+                                <input type="checkbox" name="genital_thrush" id="genital_thrush" value="1">
+                                <span class="toggle-switch"></span>
+                            </div>
+                            
+                            <div class="toggle-item">
+                                <label class="toggle-label" for="itching">
+                                    <strong>Itching</strong>
+                                    <span style="display: block; font-size: 0.8125rem; color: var(--text-muted);">Skin itching</span>
+                                </label>
+                                <input type="checkbox" name="itching" id="itching" value="1">
+                                <span class="toggle-switch"></span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Visual & Neurological Symptoms -->
+                    <div style="margin-bottom: 2rem;">
+                        <h3 style="font-family: var(--font-display); font-size: 1rem; font-weight: 600; margin-bottom: 1rem; color: var(--primary);">
+                            <i class="fas fa-eye"></i> Visual & Neurological Symptoms
+                        </h3>
+                        
+                        <div class="toggle-group">
+                            <div class="toggle-item">
+                                <label class="toggle-label" for="visual_blurring">
+                                    <strong>Visual Blurring</strong>
+                                    <span style="display: block; font-size: 0.8125rem; color: var(--text-muted);">Blurred or fuzzy vision</span>
+                                </label>
+                                <input type="checkbox" name="visual_blurring" id="visual_blurring" value="1">
+                                <span class="toggle-switch"></span>
+                            </div>
+                            
+                            <div class="toggle-item">
+                                <label class="toggle-label" for="irritability">
+                                    <strong>Irritability</strong>
+                                    <span style="display: block; font-size: 0.8125rem; color: var(--text-muted);">Mood changes, irritability</span>
+                                </label>
+                                <input type="checkbox" name="irritability" id="irritability" value="1">
+                                <span class="toggle-switch"></span>
+                            </div>
+                            
+                            <div class="toggle-item">
+                                <label class="toggle-label" for="partial_paresis">
+                                    <strong>Partial Paresis</strong>
+                                    <span style="display: block; font-size: 0.8125rem; color: var(--text-muted);">Muscle weakness or numbness</span>
+                                </label>
+                                <input type="checkbox" name="partial_paresis" id="partial_paresis" value="1">
+                                <span class="toggle-switch"></span>
+                            </div>
+                            
+                            <div class="toggle-item">
+                                <label class="toggle-label" for="muscle_stiffness">
+                                    <strong>Muscle Stiffness</strong>
+                                    <span style="display: block; font-size: 0.8125rem; color: var(--text-muted);">Stiff or rigid muscles</span>
+                                </label>
+                                <input type="checkbox" name="muscle_stiffness" id="muscle_stiffness" value="1">
+                                <span class="toggle-switch"></span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Other Symptoms -->
+                    <div style="margin-bottom: 2rem;">
+                        <h3 style="font-family: var(--font-display); font-size: 1rem; font-weight: 600; margin-bottom: 1rem; color: var(--primary);">
+                            <i class="fas fa-stethoscope"></i> Other Symptoms
+                        </h3>
+                        
+                        <div class="toggle-group">
+                            <div class="toggle-item">
+                                <label class="toggle-label" for="delayed_healing">
+                                    <strong>Delayed Healing</strong>
+                                    <span style="display: block; font-size: 0.8125rem; color: var(--text-muted);">Slow wound healing</span>
+                                </label>
+                                <input type="checkbox" name="delayed_healing" id="delayed_healing" value="1">
+                                <span class="toggle-switch"></span>
+                            </div>
+                            
+                            <div class="toggle-item">
+                                <label class="toggle-label" for="alopecia">
+                                    <strong>Alopecia</strong>
+                                    <span style="display: block; font-size: 0.8125rem; color: var(--text-muted);">Hair loss</span>
+                                </label>
+                                <input type="checkbox" name="alopecia" id="alopecia" value="1">
+                                <span class="toggle-switch"></span>
+                            </div>
+                            
+                            <div class="toggle-item">
+                                <label class="toggle-label" for="obesity">
+                                    <strong>Obesity</strong>
+                                    <span style="display: block; font-size: 0.8125rem; color: var(--text-muted);">BMI > 30</span>
+                                </label>
+                                <input type="checkbox" name="obesity" id="obesity" value="1">
+                                <span class="toggle-switch"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-footer" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                    <p style="color: var(--text-muted); font-size: 0.875rem; margin: 0;">
+                        <i class="fas fa-shield-halved"></i>
+                        Your data is processed securely and not stored permanently.
+                    </p>
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-microscope"></i>
+                        <span>Analyze Risk</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Info Cards -->
+        <div class="grid grid-3 gap-3" style="margin-top: 3rem;">
+            <div class="card" style="padding: 1.5rem; text-align: center;">
+                <i class="fas fa-brain" style="font-size: 2rem; color: var(--primary); margin-bottom: 1rem;"></i>
+                <h4 style="font-family: var(--font-display); margin-bottom: 0.5rem;">LightGBM Model</h4>
+                <p style="color: var(--text-secondary); font-size: 0.875rem;">Gradient boosting trained on 520 clinical cases</p>
+            </div>
+            
+            <div class="card" style="padding: 1.5rem; text-align: center;">
+                <i class="fas fa-bolt" style="font-size: 2rem; color: var(--warning); margin-bottom: 1rem;"></i>
+                <h4 style="font-family: var(--font-display); margin-bottom: 0.5rem;">0.06ms Inference</h4>
+                <p style="color: var(--text-secondary); font-size: 0.875rem;">Lightning-fast prediction results</p>
+            </div>
+            
+            <div class="card" style="padding: 1.5rem; text-align: center;">
+                <i class="fas fa-link" style="font-size: 2rem; color: var(--secondary); margin-bottom: 1rem;"></i>
+                <h4 style="font-family: var(--font-display); margin-bottom: 0.5rem;">Blockchain Secured</h4>
+                <p style="color: var(--text-secondary); font-size: 0.875rem;">Immutable audit trail for all screenings</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

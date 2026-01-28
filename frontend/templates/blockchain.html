@@ -1,0 +1,368 @@
+{% extends "base.html" %}
+
+{% block title %}Blockchain Records{% endblock %}
+
+{% block extra_css %}
+<style>
+    .block-item {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        margin-bottom: 0.75rem;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+    .block-item:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .block-header-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem 1.25rem;
+        cursor: pointer;
+        user-select: none;
+    }
+    .block-header-row:hover {
+        background: var(--bg-secondary);
+    }
+    .block-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex: 1;
+    }
+    .block-number {
+        background: var(--primary);
+        color: white;
+        width: 36px;
+        height: 36px;
+        border-radius: var(--radius-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 0.875rem;
+    }
+    .block-number.genesis {
+        background: var(--success);
+    }
+    .block-summary {
+        flex: 1;
+    }
+    .block-summary h4 {
+        margin: 0 0 0.25rem 0;
+        font-size: 0.9375rem;
+        font-weight: 600;
+    }
+    .block-summary span {
+        font-size: 0.8125rem;
+        color: var(--text-muted);
+    }
+    .block-meta {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+    }
+    .block-meta-item {
+        text-align: right;
+    }
+    .block-meta-item label {
+        display: block;
+        font-size: 0.6875rem;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        font-weight: 600;
+    }
+    .block-meta-item span {
+        font-size: 0.8125rem;
+        font-weight: 500;
+    }
+    .block-toggle {
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-muted);
+        transition: transform 0.3s ease;
+    }
+    .block-item.expanded .block-toggle {
+        transform: rotate(180deg);
+    }
+    .block-details {
+        display: none;
+        padding: 0 1.25rem 1.25rem;
+        border-top: 1px solid var(--border);
+        background: var(--bg-secondary);
+    }
+    .block-item.expanded .block-details {
+        display: block;
+    }
+    .detail-grid {
+        display: grid;
+        gap: 1rem;
+        padding-top: 1rem;
+    }
+    .detail-item {
+        background: var(--surface);
+        padding: 0.875rem;
+        border-radius: var(--radius-md);
+        border: 1px solid var(--border);
+    }
+    .detail-item label {
+        display: block;
+        font-size: 0.6875rem;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        font-weight: 600;
+        margin-bottom: 0.375rem;
+    }
+    .detail-item .value {
+        font-family: 'Monaco', 'Consolas', monospace;
+        font-size: 0.75rem;
+        word-break: break-all;
+        color: var(--text-primary);
+    }
+    .detail-item .value.hash {
+        color: var(--primary);
+    }
+    .user-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        background: var(--primary-bg);
+        color: var(--primary);
+        padding: 0.25rem 0.625rem;
+        border-radius: var(--radius-full);
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+    .risk-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.25rem 0.625rem;
+        border-radius: var(--radius-full);
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    .risk-badge.high {
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--danger);
+    }
+    .risk-badge.low {
+        background: rgba(34, 197, 94, 0.1);
+        color: var(--success);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container-lg">
+        <!-- Header -->
+        <div class="section-header">
+            <div class="hero-badge" style="margin: 0 auto 1rem; background: var(--secondary); color: white;">
+                <i class="fas fa-link"></i>
+                <span>Immutable Ledger</span>
+            </div>
+            <h1 class="section-title">Blockchain Audit Trail</h1>
+            <p class="section-description">
+                All screening records are secured with blockchain technology for transparency and integrity.
+            </p>
+        </div>
+        
+        <!-- Stats -->
+        <div class="grid grid-4 gap-3" style="margin-bottom: 2rem;">
+            <div class="card" style="padding: 1.5rem; text-align: center;">
+                <i class="fas fa-cubes" style="font-size: 1.5rem; color: var(--primary); margin-bottom: 0.5rem;"></i>
+                <div style="font-family: var(--font-display); font-size: 1.75rem; font-weight: 700;">{{ blockchain|length if blockchain else 0 }}</div>
+                <div style="color: var(--text-muted); font-size: 0.875rem;">Total Blocks</div>
+            </div>
+            
+            <div class="card" style="padding: 1.5rem; text-align: center;">
+                <i class="fas fa-shield-halved" style="font-size: 1.5rem; color: var(--success); margin-bottom: 0.5rem;"></i>
+                <div style="font-family: var(--font-display); font-size: 1.75rem; font-weight: 700;">{{ 'Valid' if valid else 'Invalid' }}</div>
+                <div style="color: var(--text-muted); font-size: 0.875rem;">Chain Status</div>
+            </div>
+            
+            <div class="card" style="padding: 1.5rem; text-align: center;">
+                <i class="fas fa-fingerprint" style="font-size: 1.5rem; color: var(--secondary); margin-bottom: 0.5rem;"></i>
+                <div style="font-family: var(--font-display); font-size: 1.75rem; font-weight: 700;">SHA-256</div>
+                <div style="color: var(--text-muted); font-size: 0.875rem;">Hash Algorithm</div>
+            </div>
+            
+            <div class="card" style="padding: 1.5rem; text-align: center;">
+                <i class="fas fa-clock" style="font-size: 1.5rem; color: var(--warning); margin-bottom: 0.5rem;"></i>
+                <div style="font-family: var(--font-display); font-size: 1.75rem; font-weight: 700;">Real-time</div>
+                <div style="color: var(--text-muted); font-size: 0.875rem;">Sync Status</div>
+            </div>
+        </div>
+        
+        <!-- Blockchain List -->
+        <div class="blockchain-list">
+            {% if blockchain %}
+                {% for block in blockchain %}
+                <div class="block-item" data-block-id="{{ block.index }}">
+                    <div class="block-header-row" onclick="toggleBlock({{ block.index }})">
+                        <div class="block-info">
+                            <div class="block-number {{ 'genesis' if block.index == 0 else '' }}">
+                                {{ block.index }}
+                            </div>
+                            <div class="block-summary">
+                                <h4>
+                                    {% if block.index == 0 %}
+                                        Genesis Block
+                                    {% else %}
+                                        {% if block.data and block.data.type %}
+                                            {{ block.data.type|replace('_', ' ')|title }}
+                                        {% else %}
+                                            Diagnostic Record
+                                        {% endif %}
+                                    {% endif %}
+                                </h4>
+                                <span>
+                                    <i class="fas fa-clock"></i> {{ block.timestamp }}
+                                    {% if block.data and block.data.record and block.data.record.user %}
+                                        &nbsp;•&nbsp;
+                                        <span class="user-badge">
+                                            <i class="fas fa-user"></i>
+                                            {{ block.data.record.user }}
+                                        </span>
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="block-meta">
+                            {% if block.data and block.data.record and block.data.record.risk_level %}
+                            <div class="block-meta-item">
+                                <label>Result</label>
+                                <span class="risk-badge {{ 'high' if block.data.record.risk_level == 'High Risk' else 'low' }}">
+                                    <i class="fas {{ 'fa-exclamation-triangle' if block.data.record.risk_level == 'High Risk' else 'fa-check-circle' }}"></i>
+                                    {{ block.data.record.risk_level }}
+                                </span>
+                            </div>
+                            {% endif %}
+                            <div class="block-meta-item" style="min-width: 80px;">
+                                <label>Hash</label>
+                                <span style="color: var(--primary);">{{ block.hash[:8] }}...</span>
+                            </div>
+                            <div class="block-toggle">
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="block-details">
+                        <div class="detail-grid">
+                            {% if block.data and block.data.record %}
+                            <div class="detail-item">
+                                <label><i class="fas fa-database"></i> Record Data</label>
+                                <div class="value">
+                                    {% if block.data.record.user %}
+                                        <strong>User:</strong> {{ block.data.record.user }}<br>
+                                    {% endif %}
+                                    {% if block.data.record.result_type %}
+                                        <strong>Type:</strong> {{ block.data.record.result_type|title }}<br>
+                                    {% endif %}
+                                    {% if block.data.record.risk_level %}
+                                        <strong>Risk:</strong> {{ block.data.record.risk_level }}<br>
+                                    {% endif %}
+                                    {% if block.data.record.probability %}
+                                        <strong>Probability:</strong> {{ (block.data.record.probability * 100)|round(1) }}%<br>
+                                    {% endif %}
+                                    {% if block.data.record.result_id %}
+                                        <strong>Result ID:</strong> {{ block.data.record.result_id }}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endif %}
+                            <div class="detail-item">
+                                <label><i class="fas fa-fingerprint"></i> Block Hash</label>
+                                <div class="value hash">{{ block.hash }}</div>
+                            </div>
+                            <div class="detail-item">
+                                <label><i class="fas fa-link"></i> Previous Hash</label>
+                                <div class="value">{{ block.previous_hash }}</div>
+                            </div>
+                            {% if block.nonce %}
+                            <div class="detail-item">
+                                <label><i class="fas fa-hashtag"></i> Nonce</label>
+                                <div class="value">{{ block.nonce }}</div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="card" style="padding: 3rem; text-align: center;">
+                    <i class="fas fa-cube" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 1rem;"></i>
+                    <h3 style="font-family: var(--font-display); margin-bottom: 0.5rem;">No Blocks Yet</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+                        Complete a screening to add the first record to the blockchain.
+                    </p>
+                    <a href="{{ url_for('diabetes') }}" class="btn btn-primary">
+                        <i class="fas fa-play"></i>
+                        <span>Start Screening</span>
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- Info Section -->
+        <div class="card" style="margin-top: 2rem; padding: 2rem;">
+            <h3 style="font-family: var(--font-display); margin-bottom: 1rem;">
+                <i class="fas fa-info-circle text-primary"></i> About Blockchain Records
+            </h3>
+            <div class="grid grid-2 gap-3">
+                <div>
+                    <h4 style="font-size: 0.875rem; font-weight: 600; margin-bottom: 0.5rem;">Immutability</h4>
+                    <p style="color: var(--text-secondary); font-size: 0.875rem;">
+                        Once a screening record is added to the blockchain, it cannot be altered or deleted, ensuring data integrity.
+                    </p>
+                </div>
+                <div>
+                    <h4 style="font-size: 0.875rem; font-weight: 600; margin-bottom: 0.5rem;">Transparency</h4>
+                    <p style="color: var(--text-secondary); font-size: 0.875rem;">
+                        All screening records are visible on the blockchain, providing a transparent audit trail of all assessments.
+                    </p>
+                </div>
+                <div>
+                    <h4 style="font-size: 0.875rem; font-weight: 600; margin-bottom: 0.5rem;">Chain Validation</h4>
+                    <p style="color: var(--text-secondary); font-size: 0.875rem;">
+                        Each block references the previous block's hash, creating a verifiable chain of records.
+                    </p>
+                </div>
+                <div>
+                    <h4 style="font-size: 0.875rem; font-weight: 600; margin-bottom: 0.5rem;">Secure Hashing</h4>
+                    <p style="color: var(--text-secondary); font-size: 0.875rem;">
+                        SHA-256 cryptographic hashing ensures that any tampering would be immediately detectable.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function toggleBlock(blockId) {
+    const blockItem = document.querySelector(`.block-item[data-block-id="${blockId}"]`);
+    if (blockItem) {
+        blockItem.classList.toggle('expanded');
+    }
+}
+
+// Expand first non-genesis block by default if exists
+document.addEventListener('DOMContentLoaded', function() {
+    const blocks = document.querySelectorAll('.block-item');
+    if (blocks.length > 1) {
+        blocks[1].classList.add('expanded');
+    } else if (blocks.length === 1) {
+        blocks[0].classList.add('expanded');
+    }
+});
+</script>
+{% endblock %}

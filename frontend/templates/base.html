@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="DiaBot - AI-Powered Diabetes Screening Platform with 98.1% accuracy">
+    <title>{% block title %}DiaBot - AI Health Screening{% endblock %}</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="{{ url_for('index') }}" class="nav-logo">
+                <div class="logo-icon">
+                    <i class="fas fa-heartbeat"></i>
+                </div>
+                <span class="logo-text">DiaBot</span>
+            </a>
+            
+            <div class="nav-menu" id="nav-menu">
+                <a href="{{ url_for('index') }}" class="nav-link {% if request.endpoint == 'index' %}active{% endif %}">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
+                </a>
+                <a href="{{ url_for('diabetes') }}" class="nav-link {% if request.endpoint == 'diabetes' %}active{% endif %}">
+                    <i class="fas fa-syringe"></i>
+                    <span>Diabetes</span>
+                </a>
+                <a href="{{ url_for('chatbot') }}" class="nav-link {% if request.endpoint == 'chatbot' %}active{% endif %}">
+                    <i class="fas fa-robot"></i>
+                    <span>AI Advisor</span>
+                </a>
+                {% if session.get('is_admin') %}
+                <a href="{{ url_for('view_blockchain') }}" class="nav-link {% if request.endpoint == 'view_blockchain' %}active{% endif %}">
+                    <i class="fas fa-link"></i>
+                    <span>Blockchain</span>
+                </a>
+                {% endif %}
+            </div>
+            
+            <div class="nav-actions">
+                {% if session.get('logged_in') %}
+                <div class="nav-dropdown">
+                    <button class="nav-link dropdown-toggle">
+                        <i class="fas fa-user-circle"></i>
+                        <span>{{ session.get('username', 'User') }}</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="dropdown-menu">
+                        <a href="{{ url_for('logout') }}" class="dropdown-item">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
+                    </div>
+                </div>
+                {% else %}
+                <a href="{{ url_for('login') }}" class="btn btn-outline" style="padding: 0.5rem 1rem; font-size: 0.875rem;">
+                    <i class="fas fa-sign-in-alt"></i>
+                    <span>Login</span>
+                </a>
+                <a href="{{ url_for('register') }}" class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.875rem;">
+                    <i class="fas fa-user-plus"></i>
+                    <span>Register</span>
+                </a>
+                {% endif %}
+                <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button class="nav-toggle" id="nav-toggle" aria-label="Toggle menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-container">
+                {% for category, message in messages %}
+                    <div class="flash-message flash-{{ category }}">
+                        <i class="fas {% if category == 'error' %}fa-exclamation-circle{% elif category == 'success' %}fa-check-circle{% else %}fa-info-circle{% endif %}"></i>
+                        <span>{{ message }}</span>
+                        <button class="flash-close" onclick="this.parentElement.remove()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Main Content -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <div class="footer-logo">
+                        <i class="fas fa-heartbeat"></i>
+                        <span>DiaBot</span>
+                    </div>
+                    <p>AI-Powered Diabetes Screening Platform with 98.1% accuracy using LightGBM machine learning.</p>
+                    <div class="footer-social">
+                        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" aria-label="GitHub"><i class="fab fa-github"></i></a>
+                        <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-links">
+                    <h4>Screening</h4>
+                    <a href="{{ url_for('diabetes') }}">Diabetes Risk</a>
+                </div>
+                
+                <div class="footer-links">
+                    <h4>Resources</h4>
+                    <a href="{{ url_for('chatbot') }}">AI Health Advisor</a>
+                    {% if session.get('is_admin') %}
+                    <a href="{{ url_for('view_blockchain') }}">Blockchain Records</a>
+                    {% endif %}
+                    <a href="#">API Documentation</a>
+                </div>
+                
+                <div class="footer-disclaimer">
+                    <h4>Medical Disclaimer</h4>
+                    <p>This system is designed as a screening aid, not a replacement for clinical diagnosis by a certified medical professional. Always consult healthcare providers for medical decisions.</p>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2025 DiaBot. All rights reserved.</p>
+                <p>Built with <i class="fas fa-heart" style="color: var(--danger);"></i> for better healthcare</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
