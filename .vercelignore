@@ -1,0 +1,25 @@
+# Ignore development files
+__pycache__/
+*.pyc
+*.pyo
+.env
+.env.local
+.venv/
+venv/
+*.egg-info/
+.git/
+.gitignore
+
+# Ignore instance data (SQLite db)
+instance/
+
+# Ignore upload files
+uploads/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

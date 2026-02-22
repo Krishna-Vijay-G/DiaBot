@@ -37,6 +37,9 @@ db = SQLAlchemy()
 
 def _make_db_uri(db_filename):
     """Create SQLite database URI with proper path handling - stored in instance folder"""
+    # Use in-memory SQLite for Vercel (no persistent filesystem)
+    if os.environ.get('VERCEL'):
+        return "sqlite:///:memory:"
     db_path = os.path.join(BASE_DIR, 'instance', db_filename)
     return f"sqlite:///{db_path.replace(chr(92), '/')}"
 
@@ -44,7 +47,7 @@ def _make_db_uri(db_filename):
 class Config:
     """Application configuration"""
     SECRET_KEY = os.environ.get("SESSION_SECRET") or "dev-secret-key-change-in-production-12345"
-    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL") or _make_db_uri('diabot.db')
+    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
     # Configure engine options based on database type
@@ -63,8 +66,8 @@ class Config:
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024
     ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
     
-    MODELS_DIR = os.path.join(BASE_DIR, 'models')
-    DIABETES_MODEL_PATH = os.path.join(MODELS_DIR, 'Diabetes_Model', 'diab_model.joblib')
+    MODELS_DIR = os.path.join(BACKEND_DIR, 'Diabetes_Model')
+    DIABETES_MODEL_PATH = os.path.join(MODELS_DIR, 'diab_model.joblib')
     GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
     
     TEMPLATE_FOLDER = os.path.join(BASE_DIR, 'frontend', 'templates')
@@ -482,18 +485,28 @@ def create_app() -> Flask:
     app.config.from_object(Config)
     
     # Enable CORS for frontend-backend separation
+    # Get allowed origins from environment or use defaults
+    allowed_origins = os.environ.get('ALLOWED_ORIGINS', '').split(',') if os.environ.get('ALLOWED_ORIGINS') else [
+        "http://localhost:3000", "http://127.0.0.1:3000", 
+        "http://localhost:5500", "http://127.0.0.1:5500",
+        "http://localhost:5000", "http://127.0.0.1:5000"
+    ]
     CORS(app, resources={
-        r"/api/*": {
-            "origins": ["http://localhost:3000", "http://127.0.0.1:3000", "http://localhost:5500", "http://127.0.0.1:5500"],
+        r"/*": {
+            "origins": allowed_origins + ["https://*.vercel.app"],
             "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
             "allow_headers": ["Content-Type", "Authorization"],
             "supports_credentials": True
         }
     })
     
-    # Ensure directories exist
-    os.makedirs(Config.UPLOAD_FOLDER, exist_ok=True)
-    os.makedirs(Config.INSTANCE_FOLDER, exist_ok=True)
+    # Ensure directories exist (skip if read-only filesystem like Vercel)
+    try:
+        os.makedirs(Config.UPLOAD_FOLDER, exist_ok=True)
+        os.makedirs(Config.INSTANCE_FOLDER, exist_ok=True)
+    except OSError:
+        # Running on read-only filesystem (e.g., Vercel), skip directory creation
+        logging.warning("Unable to create directories - running in read-only filesystem mode")
     
     # Configure logging
     logging.basicConfig(
